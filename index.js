@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const apirouter=require('./routers/api.js');
+const lib= require('./apis/lib')
 
 const mongoose = require('mongoose');
 const app=express();
@@ -15,15 +16,14 @@ let dbconn=false
 db.once('open',()=>{console.log('Connessione al DB riuscita');dbconn=true})
 
 /* REDIRECTION SECTION */
-const hostname='localhost'
-const portnum=3000
-let redirectlogin=require('util').format('http://%s:%d/login',hostname,portnum);
-let redirectregist=require('util').format('http://%s:%d/register',hostname,portnum);
-app.get('/register',(req,res)=>res.redirect(redirectregist))
-app.get('/api/register',(req,res)=>res.redirect(redirectregist))
+// In case the users makes the request to the wrong port expecting the webapp, we redirect him
 
-app.get('/api/login',(req,res)=>res.redirect(redirectlogin))
-app.get('/api/login',(req,res)=>res.redirect(redirectlogin))
+app.get('/',(req,res)=>res.redirect(lib.redirecthome))
+app.get('/register',(req,res)=>res.redirect(lib.redirectregist))
+app.get('/api/register',(req,res)=>res.redirect(lib.redirectregist))
+app.get('/api/login',(req,res)=>res.redirect(lib.redirectlogin))
+app.get('/login',(req,res)=>res.redirect(lib.redirectlogin))
+app.get('/api/login',(req,res)=>res.redirect(lib.redirectlogin))
 
 app.get('/connection_check', (req, res) => {
     console.log('Required connection check');
@@ -34,4 +34,4 @@ app.get('/connection_check', (req, res) => {
 })
 app.use('/api', apirouter)
 
-app.listen(8080, () => { console.log('app in ascolto') })
+app.listen(lib.backendport, () => { console.log('app in ascolto') })
