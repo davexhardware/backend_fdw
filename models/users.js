@@ -3,7 +3,6 @@ var userSchema = mongoose.Schema({
     email: String,
     firstName: String,
     lastName: String,
-    password: String,
-    token: String
+    password: String
 })
 module.exports = mongoose.model('User', userSchema);
