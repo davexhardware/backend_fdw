@@ -25,7 +25,6 @@ db.once('open',()=>{console.log('Connessione al DB riuscita');dbconn=true})
 app.get('/',(req,res)=>res.redirect(lib.redirecthome))
 app.get('/register',(req,res)=>res.redirect(lib.redirectregist))
 app.get('/api/register',(req,res)=>res.redirect(lib.redirectregist))
-app.get('/api/login',(req,res)=>res.redirect(lib.redirectlogin))
 app.get('/login',(req,res)=>res.redirect(lib.redirectlogin))
 app.get('/api/login',(req,res)=>res.redirect(lib.redirectlogin))
 
@@ -33,7 +32,7 @@ app.get('/connection_check', (req, res) => {
     console.log('Required connection check');
     res.json({
         connection: true,
-        dbconn:dbconn
+        dbconn: dbconn
     })
 })
 app.use('/api', apirouter)

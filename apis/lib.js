@@ -1,9 +1,24 @@
 const hostname='localhost';
 const frontendport=3000;
 const jwt = require('jsonwebtoken');
-const ms=require('ms')
 function generateAccessToken(userid) {
     return jwt.sign({id:userid}, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
+}
+function authenticateToken(req,res,next) {
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+
+    if (token == null) return res.sendStatus(401).json({error:'Did not find a JWT cookie'})
+
+    jwt.verify(token, process.env.TOKEN_SECRET, (err, id) => {
+
+        if (err) {
+            return res.sendStatus(403).json({error:'Error during JWT verification (check if you are logged in and retry) '+err.message})
+        }
+
+        req.user=id
+        next()
+    })
 }
 
 function validateEmail(email) {
@@ -36,4 +51,4 @@ const backendport=8080;
 let redirecthome=require('util').format('http://%s:%d/',hostname,frontendport);
 let redirectlogin=require('util').format('http://%s:%d/login',hostname,frontendport);
 let redirectregist=require('util').format('http://%s:%d/register',hostname,frontendport);
-module.exports={ generateAccessToken, redirectregist, redirectlogin, redirecthome, backendport,validateEmail,validateName, validateHashPassword}
+module.exports={ authenticateToken, generateAccessToken, redirectregist, redirectlogin, redirecthome, backendport,validateEmail,validateName, validateHashPassword}

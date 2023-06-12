@@ -24,12 +24,12 @@ let login =(req,res)=> {
                             });
                         } else throw new TypeError('user not found')
                     }catch(e) {
-                        res.json({error: 'user or password not found'});
+                        res.sendStatus(403).json({error: 'user or password not found'});
                     }
                 })
-                .catch(e => res.json({error: 'user not found or incorrect password' + e.message}))
+                .catch(e => res.sendStatus(403).json({error: 'user not found or incorrect password' + e.message}))
 
-        } else return res.json({error: 'email or password format not valid'})
-    } else return res.json({error: "didn't receive email and/or password in post"})
+        } else return res.sendStatus(403).json({error: 'email or password format not valid'})
+    } else return res.sendStatus(403).json({error: "didn't receive email and/or password in post"})
 }
 module.exports={ login}

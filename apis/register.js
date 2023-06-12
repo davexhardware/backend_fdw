@@ -28,19 +28,19 @@ let register = (req,res)=>{
                                                 let token = lib.generateAccessToken(String(el['_id']))
                                                 return res.json({jwtcookie: token})
                                             }).catch(e => {
-                                                return res.json({error: wrong+e.message})
+                                                return res.sendStatus(403).json({error: wrong+e.message})
                                             });
                                         } else throw new TypeError('user already registered')
-                                    }catch(e){ return res.json({error: wrong+e.message})}
-                                }).catch(e => { return res.json({error: wrong+e.message})})
+                                    }catch(e){ return res.sendStatus(403).json({error: wrong+e.message})}
+                                }).catch(e => { return res.sendStatus(403).json({error: wrong+e.message})})
                             }else throw new TypeError(err.message)
                         })
                     }else throw new TypeError(er.message)
                 });
             }else throw new TypeError('Validation failed')
         }catch(e) {
-            res.json({error: wrong+e.message})
+            res.sendStatus(403).json({error: wrong+e.message})
         }
-    }else res.json({error :"didn't receive all the required fields"})
+    }else res.sendStatus(403).json({error :"didn't receive all the required fields"})
 }
 module.exports={register}

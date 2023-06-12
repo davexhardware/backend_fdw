@@ -1,1 +1,4 @@
-const mongoose = require('mongoose');
+let getchat= (req,res)=>{
+    return 1;
+}
+module.exports={getchat}
