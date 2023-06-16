@@ -2,10 +2,17 @@ const hostname='localhost';
 const frontendport=5173;
 const jwt = require('jsonwebtoken');
 const errCode=403;
+
+function returnjwterror(err,res){
+    return res.status(403).json({error:'Error during JWT verification (check if you are logged in and retry) '+err.message})
+}
 function generateAccessToken(userid) {
     return jwt.sign({id:userid}, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
 }
 function authenticateToken(req,res,next) {
+    if(!req.cookies['authorization']){
+        returnjwterror('no cookie')
+    }
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1]
 
@@ -14,7 +21,7 @@ function authenticateToken(req,res,next) {
     jwt.verify(token, process.env.TOKEN_SECRET, (err, id) => {
 
         if (err) {
-            return res.sendStatus(403).json({error:'Error during JWT verification (check if you are logged in and retry) '+err.message})
+
         }
 
         req.user=id
@@ -48,7 +55,7 @@ function validateName(name){
     let regex=new RegExp('(\\w+.?)+');
     return regex.test(String(name).toLowerCase())
 }
-const backendport=8080;
+const backendport=5000;
 let redirecthome=require('util').format('http://%s:%d/',hostname,frontendport);
 let redirectlogin=require('util').format('http://%s:%d/login',hostname,frontendport);
 let redirectregist=require('util').format('http://%s:%d/register',hostname,frontendport);

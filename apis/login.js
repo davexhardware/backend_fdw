@@ -14,15 +14,15 @@ let login =(req,res)=> {
                     try{
                         if(user) { // check user existence
                             //console.log('ok2')
-                            bcrypt.hash(String(req.body['password']), String(user['password']).substring(0,29), (err, hash)=> {
+                            bcrypt.compare(String(req.body['password']), String(user['password']), (err, same)=> {
                                 // returns hash
-                                if(hash===user['password']) {
+                                if(same) {
                                     let token=lib.generateAccessToken(user['_id'])
                                     return res.cookie("access_token", token, {
                                         httpOnly: true
                                     }).status(200).send()
                                 }
-                                else throw new TypeError('Password do not match')
+                                return res.status(lib.errCode).json({error: 'passwords do not match'});
                             });
                         } else throw new TypeError('user not found')
                     }catch(e) {
