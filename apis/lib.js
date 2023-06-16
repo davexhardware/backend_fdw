@@ -1,5 +1,5 @@
 const hostname='localhost';
-const frontendport=process.env.FPORT;
+const frontendport=5173;
 const jwt = require('jsonwebtoken');
 const errCode=403;
 function generateAccessToken(userid) {
@@ -48,8 +48,8 @@ function validateName(name){
     let regex=new RegExp('(\\w+.?)+');
     return regex.test(String(name).toLowerCase())
 }
-const backendport=process.env.BPORT;
+const backendport=8080;
 let redirecthome=require('util').format('http://%s:%d/',hostname,frontendport);
 let redirectlogin=require('util').format('http://%s:%d/login',hostname,frontendport);
 let redirectregist=require('util').format('http://%s:%d/register',hostname,frontendport);
-module.exports={ authenticateToken, generateAccessToken,errCode, redirectregist, redirectlogin, redirecthome, backendport,validateEmail,validateName, validateHashPassword}
+module.exports={ authenticateToken, generateAccessToken, errCode, redirectregist, redirectlogin, redirecthome, backendport,validateEmail,validateName, validateHashPassword}

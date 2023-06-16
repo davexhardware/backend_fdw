@@ -1,13 +1,13 @@
 const express = require('express');
 const cors = require('cors');
 const apirouter=require('./routers/api.js');
-const lib= require('./apis/lib')
 const cookieparser=require('cookie-parser')
 //creates the secret token for jwt signing
 const secret=require('crypto').randomBytes(64).toString('hex');
 require("dotenv").config();
 delete process.env.TOKEN_SECRET;
 process.env.TOKEN_SECRET=secret;
+const lib= require('./apis/lib')
 const mongoose = require('mongoose');
 const app=express();
 
@@ -38,4 +38,4 @@ app.get('/connection_check', (req, res) => {
 })
 app.use('/api', apirouter)
 
-app.listen(lib.backendport, () => { console.log('app in ascolto') })
+app.listen(lib.backendport, () => { console.log('app in ascolto sulla porta: '+lib.backendport) })
