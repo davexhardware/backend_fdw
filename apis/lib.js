@@ -44,7 +44,7 @@ function validateNonHashPassword(pwd) {
 }
 */
 function validateName(name){
-    let regex=new RegExp('([\\w]+[\.]?)+');
+    let regex=new RegExp('(\\w+.?)+');
     return regex.test(String(name).toLowerCase())
 }
 const backendport=8080;

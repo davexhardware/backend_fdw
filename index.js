@@ -23,10 +23,8 @@ db.once('open',()=>{console.log('Connessione al DB riuscita');dbconn=true})
 // In case the users makes the request to the wrong port expecting the webapp, we redirect him
 
 app.get('/',(req,res)=>res.redirect(lib.redirecthome))
-app.get('/register',(req,res)=>res.redirect(lib.redirectregist))
-app.get('/api/register',(req,res)=>res.redirect(lib.redirectregist))
-app.get('/login',(req,res)=>res.redirect(lib.redirectlogin))
-app.get('/api/login',(req,res)=>res.redirect(lib.redirectlogin))
+app.get(/.*register$/,(req,res)=>res.redirect(lib.redirectregist))
+app.get(/.*login$/,(req,res)=>res.redirect(lib.redirectlogin))
 
 app.get('/connection_check', (req, res) => {
     console.log('Required connection check');

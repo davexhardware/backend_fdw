@@ -1,9 +1,11 @@
 const users=require('../models/users');
 const lib = require("./lib");
-let register=function(req,res){
+let getfriends=function(req,res){
     lib.authenticateToken(req,res,()=> {
         let userid=req.user;
-        friends.
+        let friends=[]
+        let c=friends.find({a:userid}).cursor()
+        c.forEach()
     })
 }
 module.exports={getfriends}
