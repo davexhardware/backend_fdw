@@ -3,6 +3,7 @@ const lib=require('./lib');
 const bcrypt = require ('bcrypt');
 const saltRounds=10;
 const wrong='Something went wrong, check and retry: '
+
 let register = (req,res)=>{
     let {email,password,firstname,lastname}=req.body;
 
@@ -26,21 +27,23 @@ let register = (req,res)=>{
                                                 password: hash,
                                             }).then(el => {
                                                 let token = lib.generateAccessToken(String(el['_id']))
-                                                return res.json({jwtcookie: token})
+                                                return res.cookie("access_token", token, {
+                                                    httpOnly: true
+                                                }).status(200).send()
                                             }).catch(e => {
-                                                return res.sendStatus(403).json({error: wrong+e.message})
+                                                return res.status(lib.errCode).json({error: wrong+e.message})
                                             });
                                         } else throw new TypeError('user already registered')
-                                    }catch(e){ return res.sendStatus(403).json({error: wrong+e.message})}
-                                }).catch(e => { return res.sendStatus(403).json({error: wrong+e.message})})
+                                    }catch(e){ return res.status(lib.errCode).json({error: wrong+e.message})}
+                                }).catch(e => { return res.status(lib.errCode).json({error: wrong+e.message})})
                             }else throw new TypeError(err.message)
                         })
                     }else throw new TypeError(er.message)
                 });
             }else throw new TypeError('Validation failed')
         }catch(e) {
-            res.sendStatus(403).json({error: wrong+e.message})
+            res.status(lib.errCode).json({error: wrong+e.message})
         }
-    }else res.sendStatus(403).json({error :"didn't receive all the required fields"})
+    }else res.status(lib.errCode).json({error :"didn't receive all the required fields"})
 }
 module.exports={register}

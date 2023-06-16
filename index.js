@@ -2,14 +2,17 @@ const express = require('express');
 const cors = require('cors');
 const apirouter=require('./routers/api.js');
 const lib= require('./apis/lib')
+const cookieparser=require('cookie-parser')
 //creates the secret token for jwt signing
 const secret=require('crypto').randomBytes(64).toString('hex');
-require('fs').createWriteStream('./.env').write('TOKEN_SECRET='+secret,(e)=>{e?console.log(e.message):null});;
 require("dotenv").config();
+delete process.env.TOKEN_SECRET;
+process.env.TOKEN_SECRET=secret;
 const mongoose = require('mongoose');
 const app=express();
 
 app.use(cors());
+app.use(cookieparser());
 app.use(express.json());
 const user= 'fdwuser';
 const password= '1OVXZAlRs4UNjw1I'

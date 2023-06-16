@@ -1,6 +1,7 @@
 const hostname='localhost';
-const frontendport=3000;
+const frontendport=process.env.FPORT;
 const jwt = require('jsonwebtoken');
+const errCode=403;
 function generateAccessToken(userid) {
     return jwt.sign({id:userid}, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
 }
@@ -47,8 +48,8 @@ function validateName(name){
     let regex=new RegExp('(\\w+.?)+');
     return regex.test(String(name).toLowerCase())
 }
-const backendport=8080;
+const backendport=process.env.BPORT;
 let redirecthome=require('util').format('http://%s:%d/',hostname,frontendport);
 let redirectlogin=require('util').format('http://%s:%d/login',hostname,frontendport);
 let redirectregist=require('util').format('http://%s:%d/register',hostname,frontendport);
-module.exports={ authenticateToken, generateAccessToken, redirectregist, redirectlogin, redirecthome, backendport,validateEmail,validateName, validateHashPassword}
+module.exports={ authenticateToken, generateAccessToken,errCode, redirectregist, redirectlogin, redirecthome, backendport,validateEmail,validateName, validateHashPassword}

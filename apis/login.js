@@ -18,18 +18,20 @@ let login =(req,res)=> {
                                 // returns hash
                                 if(hash===user['password']) {
                                     let token=lib.generateAccessToken(user['_id'])
-                                    return res.json({jwtcookie:token})
+                                    return res.cookie("access_token", token, {
+                                        httpOnly: true
+                                    }).status(200).send()
                                 }
                                 else throw new TypeError('Password do not match')
                             });
                         } else throw new TypeError('user not found')
                     }catch(e) {
-                        res.sendStatus(403).json({error: 'user or password not found'});
+                        res.status(lib.errCode).json({error: 'user or password not found'});
                     }
                 })
-                .catch(e => res.sendStatus(403).json({error: 'user not found or incorrect password' + e.message}))
+                .catch(e =>  res.status(lib.errCode).json({error: 'user not found or incorrect password' + e.message}))
 
-        } else return res.sendStatus(403).json({error: 'email or password format not valid'})
-    } else return res.sendStatus(403).json({error: "didn't receive email and/or password in post"})
+        } else return res.status(lib.errCode).json({error: 'email or password format not valid'})
+    } else return res.status(lib.errCode).json({error: "didn't receive email and/or password in post"})
 }
 module.exports={ login}
