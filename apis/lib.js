@@ -4,24 +4,22 @@ const jwt = require('jsonwebtoken');
 const errCode=403;
 
 function returnjwterror(err,res){
-    return res.status(403).json({error:'Error during JWT verification (check if you are logged in and retry) '+err.message})
+    return res.status(401).json({error:'Error during JWT verification (check if you are logged in and retry) '+err.message})
 }
 function generateAccessToken(userid) {
     return jwt.sign({id:userid}, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
 }
 function authenticateToken(req,res,next) {
-    if(!req.cookies['authorization']){
-        returnjwterror('no cookie')
+    if(!req.cookies['access_token']){
+        return returnjwterror({message:'no cookie'},res)
     }
-    const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(' ')[1]
+    const token = req.cookies['access_token']
 
-    if (token == null) return res.sendStatus(401).json({error:'Did not find a JWT cookie'})
 
     jwt.verify(token, process.env.TOKEN_SECRET, (err, id) => {
 
         if (err) {
-
+            return returnjwterror(err,res)
         }
 
         req.user=id

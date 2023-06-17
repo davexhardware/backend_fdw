@@ -21,10 +21,10 @@ let register = (req,res)=>{
                                     try {
                                         if (!el) {
                                             users.create({
-                                                email: email,
-                                                firstName: firstname,
-                                                lastName: lastname,
-                                                password: hash,
+                                                email: String(email).trim(),
+                                                firstName: String(firstname).trim(),
+                                                lastName: String(lastname).trim(),
+                                                password: String(hash).trim(),
                                             }).then(el => {
                                                 let token = lib.generateAccessToken(String(el['_id']))
                                                 return res.cookie("access_token", token, {
