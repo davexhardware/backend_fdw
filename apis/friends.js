@@ -10,7 +10,7 @@ let getfriends=function(req,res){
             doc.populate('friends').then(
                 (docp)=>{
                     let friends=Array();
-                    docp.friends.forEach(el=>friends.push({email: el.email,firstName:el.firstName, lastName:el.lastName}))
+                    docp.friends.forEach(el=>friends.push({objectId:String(el._id) ,email: el.email,firstName:el.firstName, lastName:el.lastName}))
                     return res.status(200).json(friends);
                 }).catch(err => {return res.status(500).json({error: "error while populating the data"}) })
         }).catch(err=> { return res.status(404).json({error: "user not found"}) })
@@ -24,9 +24,16 @@ let addfriend= (req,res)=>{
             if(String(doc._id)===userid){
                 return res.status(401).json({error:"cannot add yourself as a friend"}).end()
             }
-            Promise.all([users.updateOne({_id:userid},{ $push:{friends: doc._id}}),users.updateOne({_id:String(doc._id)},{$push:{friends:userid}})])
+            let alreadyfrnd=false;
+            doc.friends.forEach(frid=>{
+                if (String(frid)===userid)
+                    alreadyfrnd=true
+                    return res.status(401).json({error: "the users are already friends"}).end()
+            })
+            if(!alreadyfrnd)
+                Promise.all([users.updateOne({_id:userid},{ $push:{friends: doc._id}}),users.updateOne({_id:String(doc._id)},{$push:{friends:userid}})])
             .then(ok=>{
-                res.status(200).send({ok:"friend added"})
+                return res.status(200).send({ok:"friend added"})
             }).catch(err=>{ res.status(500).json({error:'Pushing arrays error: '+err.message})})
 
         }).catch(err=> {return res.status(404).json({error: "friend not registered "+err.message}) })
