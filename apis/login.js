@@ -19,7 +19,8 @@ let login =(req,res)=> {
                                 if(same) {
                                     let token=lib.generateAccessToken(user['_id'])
                                     return res.cookie("access_token", token, {
-                                        httpOnly: true
+                                        httpOnly: false,
+                                        domain: 'localhost'
                                     }).status(200).send()
                                 }
                                 return res.status(lib.errCode).json({error: 'passwords do not match'});

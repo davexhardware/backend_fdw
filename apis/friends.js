@@ -1,6 +1,5 @@
 const users=require('../models/users');
 const lib = require("./lib");
-const {Types} = require("mongoose");
 let getfriends=function(req,res){
     lib.authenticateToken(req,res,()=> {
         let userid=req.user['id']
