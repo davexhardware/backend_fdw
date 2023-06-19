@@ -21,7 +21,7 @@ let login =(req,res)=> {
                                     return res.cookie("access_token", token, {
                                         httpOnly: false,
                                         domain: 'localhost'
-                                    }).status(200).send()
+                                    }).redirect(lib.redirectchat)
                                 }
                                 return res.status(lib.errCode).json({error: 'passwords do not match'});
                             });

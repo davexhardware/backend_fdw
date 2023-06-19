@@ -1,6 +1,8 @@
 const hostname='localhost';
 const frontendport=5173;
+const backendport=5000;
 const jwt = require('jsonwebtoken');
+const util=require('util')
 const errCode=403;
 
 function returnjwterror(err,res){
@@ -53,8 +55,9 @@ function validateName(name){
     let regex=new RegExp('(\\w+.?)+');
     return regex.test(String(name).toLowerCase())
 }
-const backendport=5000;
-let redirecthome=require('util').format('http://%s:%d/',hostname,frontendport);
-let redirectlogin=require('util').format('http://%s:%d/login',hostname,frontendport);
-let redirectregist=require('util').format('http://%s:%d/register',hostname,frontendport);
-module.exports={ authenticateToken, generateAccessToken, errCode, redirectregist, redirectlogin, redirecthome, backendport,validateEmail,validateName, validateHashPassword}
+
+let redirecthome=util.format('http://%s:%d/',hostname,frontendport);
+let redirectchat=util.format('http://%s:%d/chat',hostname,frontendport);
+let redirectlogin=util.format('http://%s:%d/login',hostname,frontendport);
+let redirectregist=util('util').format('http://%s:%d/register',hostname,frontendport);
+module.exports={ authenticateToken, generateAccessToken, errCode, redirectregist, redirectlogin,redirectchat, redirecthome, backendport,validateEmail,validateName, validateHashPassword}
