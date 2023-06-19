@@ -27,9 +27,7 @@ let register = (req,res)=>{
                                                 password: String(hash).trim(),
                                             }).then(el => {
                                                 let token = lib.generateAccessToken(String(el['_id']))
-                                                return res.cookie("access_token", token, {
-                                                    httpOnly: true
-                                                }).redirect(lib.redirectchat)
+                                                return res.status(200).json({access_token:token})
                                             }).catch(e => {
                                                 return res.status(lib.errCode).json({error: wrong+e.message})
                                             });

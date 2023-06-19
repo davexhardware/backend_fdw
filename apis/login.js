@@ -18,10 +18,7 @@ let login =(req,res)=> {
                                 // returns hash
                                 if(same) {
                                     let token=lib.generateAccessToken(user['_id'])
-                                    return res.cookie("access_token", token, {
-                                        httpOnly: false,
-                                        domain: 'localhost'
-                                    }).redirect(lib.redirectchat)
+                                    return res.status(200).json({access_token: token})
                                 }
                                 return res.status(lib.errCode).json({error: 'passwords do not match'});
                             });
