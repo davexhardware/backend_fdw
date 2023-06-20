@@ -59,5 +59,5 @@ function validateName(name){
 let redirecthome=util.format('http://%s:%d/',hostname,frontendport);
 let redirectchat=util.format('http://%s:%d/chat',hostname,frontendport);
 let redirectlogin=util.format('http://%s:%d/login',hostname,frontendport);
-let redirectregist=util('util').format('http://%s:%d/register',hostname,frontendport);
+let redirectregist=util.format('http://%s:%d/register',hostname,frontendport);
 module.exports={ authenticateToken, generateAccessToken, errCode, redirectregist, redirectlogin,redirectchat, redirecthome, backendport,validateEmail,validateName, validateHashPassword}
