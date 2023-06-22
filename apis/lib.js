@@ -27,10 +27,10 @@ function authenticateWsToken(data,ws,next){
 
 }
 function authenticateToken(req,res,next) {
-    if(!req.cookie['auth_token']){
+    if(!req.cookies['auth_token']){
         return returnjwterror({message:'no cookie'},res)
     }
-    const token =req.cookie['auth_token']
+    const token =req.cookies['auth_token']
 
 
     jwt.verify(token, process.env.TOKEN_SECRET, (err, id) => {
