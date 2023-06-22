@@ -62,9 +62,10 @@ let addfriend= (req,res)=>{
                 }
                 let alreadyfrnd = false;
                 doc.friends.forEach(frid => {
-                    if (String(frid) === userid)
+                    if (String(frid) === userid) {
                         alreadyfrnd = true
                         return res.status(401).json({error: "the users are already friends"}).end()
+                    }
                 })
                 if (!alreadyfrnd)
                     Promise.all([users.updateOne({_id: userid}, {$push: {friends: doc._id}}), users.updateOne({_id: String(doc._id)}, {$push: {friends: userid}})])

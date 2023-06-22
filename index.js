@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-const cookieparser=require('cookie-parser')
+var cookieSession = require('cookie-session')
+//const cookieparser=require('cookie-parser')
 //creates the secret token for jwt signing
 const secret=require('crypto').randomBytes(64).toString('hex');
 require("dotenv").config();
@@ -17,7 +18,12 @@ var corsOptions = {
 }
 app.use(cors());
 
-app.use(cookieparser());
+//app.use(cookieparser());
+app.use(cookieSession({
+    name: 'auth_token',
+    signed:false,
+    domain:'localhost'
+}))
 app.use(express.json());
 
 const apirouter=require('./routers/api.js');

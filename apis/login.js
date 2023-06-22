@@ -17,8 +17,9 @@ let login =(req,res)=> {
                             bcrypt.compare(String(req.body['password']), String(user['password']), (err, same)=> {
                                 // returns hash
                                 if(same) {
-                                    let token=lib.generateAccessToken(user['_id'])
-                                    return res.status(200).cookie('access_token', token,{ domain:'localhost'}).end()
+                                    let token=lib.generateAccessToken(user['_id']);
+                                    req.session.token=token
+                                    return res.status(200).end()
                                 }
                                 return res.status(lib.errCode).json({error: 'passwords do not match'});
                             });

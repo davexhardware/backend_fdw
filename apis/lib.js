@@ -1,5 +1,4 @@
 const hostname='localhost';
-
 const jwt = require('jsonwebtoken');
 require("dotenv").config();
 const util=require('util')
@@ -28,10 +27,10 @@ function authenticateWsToken(data,ws,next){
 
 }
 function authenticateToken(req,res,next) {
-    if(!req.cookies['access_token']){
+    if(!req.session.isPopulated){
         return returnjwterror({message:'no cookie'},res)
     }
-    const token = req.cookies['access_token']
+    const token = req.session.token
 
 
     jwt.verify(token, process.env.TOKEN_SECRET, (err, id) => {

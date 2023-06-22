@@ -1,7 +1,7 @@
 const messages = require('../models/messages')
 const lib=require('./lib');
 const ws=require('ws');
-function getmessages(userid,friendId,ws){
+function getmessages(userid,friendId){
     let msg = [];
 
     messages.find({
@@ -17,10 +17,10 @@ function getmessages(userid,friendId,ws){
             el.set('msgtype', msgtype, {strict: false});
             msg.push(el)
         })
-    }).then(succ => {
-        console.log(msg)
-        return ws.send(msg)
+    }).catch(err=>{
+        return 'error: '+err
     })
+    return msg
 }
 function getwatcher(friendId,userid){
     return msgwatcher = messages.watch({
@@ -37,33 +37,40 @@ let getchat = (ws, req) => {
     let msgwatcher=undefined;
     ws.onmessage=(msg)=>{
         let data=JSON.parse(msg.data);
-        if(data['access_token']){
-            lib.authenticateWsToken(data, ws, (uid) => {
-                userid =uid
-                authenticated=true
-                if(!friendId){
-                    ws.send('error: provide friendId')
-                }else {
-                    friendId = data['friendId'];
-                    getmessages(userid,friendId,ws);
-                    if(!msgwatcher)
-                        msgwatcher=getwatcher(userid,friendId);
-                }
-            })
-        }else if(data['friendId'] && authenticated) {
-            friendId = data['friendId']
-            getmessages(userid,friendId,ws);
-            if(!msgwatcher)
-                msgwatcher=getwatcher(userid,friendId);
+        if(!authenticated){
+            if(data['access_token']) {
+                lib.authenticateWsToken(data, ws, (uid) => {
+                    userid = uid
+                    authenticated = true
+                    if ( !data['friendId']) {
+                        ws.send('ok: authenticated, provide friendId')
+                    } else {
+                        friendId = data['friendId'];
+                        ws.send('ok: authenticated and connected to friend')
+                        ws.send(getmessages(userid, friendId));
+                        if (typeof msgwatcher=== 'undefined')
+                            msgwatcher = getwatcher(userid, friendId);
+                    }
+                })
+            }else ws.send('error: provide authentication token first')
+        }else {
+
+            if (data['friendId']) {
+                friendId = data['friendId']
+                getmessages(userid, friendId, ws);
+                if (!msgwatcher)
+                    msgwatcher = getwatcher(userid, friendId);
+            }
+            if (data['message']) {
+                ws.send('msg received')
+            }
+            if (userid && friendId)
+                msgwatcher.on('change', next => {
+                    console.log(next)
+                });
         }
-        if(data['message'] && authenticated){
-            ws.send('msg received')
-        }
-        if(authenticated && userid && friendId)
-            msgwatcher.on('change', next => {
-                console.log(next)
-            });
     }
+    ws.onclose()
 
 
 
