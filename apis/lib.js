@@ -11,6 +11,20 @@ function returnjwterror(err,res){
 function generateAccessToken(userid) {
     return jwt.sign({id:userid}, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
 }
+function authenticateWsToken(data,ws,next){
+    if(!data['access_token']){
+        return ws.send('error: no auth_token')
+    }
+    const token = data['access_token'];
+    jwt.verify(token, process.env.TOKEN_SECRET, (err, id) => {
+
+        if (err) {
+            return ws.send('error: verification failed')
+        }
+        next(id.id)
+    })
+
+}
 function authenticateToken(req,res,next) {
     if(!req.cookies['access_token']){
         return returnjwterror({message:'no cookie'},res)
@@ -56,8 +70,8 @@ function validateName(name){
     return regex.test(String(name).toLowerCase())
 }
 
-let redirecthome=util.format('http://%s:%d/',hostname,frontendport);
+let redirecthome=util.format('http://%s:%d',hostname,frontendport);
 let redirectchat=util.format('http://%s:%d/chat',hostname,frontendport);
 let redirectlogin=util.format('http://%s:%d/login',hostname,frontendport);
 let redirectregist=util.format('http://%s:%d/register',hostname,frontendport);
-module.exports={ authenticateToken, generateAccessToken, errCode, redirectregist, redirectlogin,redirectchat, redirecthome, backendport,validateEmail,validateName, validateHashPassword}
+module.exports={ authenticateToken, authenticateWsToken, generateAccessToken, errCode, redirectregist, redirectlogin,redirectchat, redirecthome, backendport,validateEmail,validateName, validateHashPassword}
