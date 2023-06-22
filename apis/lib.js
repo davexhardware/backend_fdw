@@ -13,10 +13,10 @@ function generateAccessToken(userid) {
     return jwt.sign({id:userid}, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
 }
 function authenticateWsToken(data,ws,next){
-    if(!data['access_token']){
+    if(!data.auth_token){
         return ws.send('error: no auth_token')
     }
-    const token = data['access_token'];
+    const token = data.auth_token;
     jwt.verify(token, process.env.TOKEN_SECRET, (err, id) => {
 
         if (err) {
@@ -27,10 +27,10 @@ function authenticateWsToken(data,ws,next){
 
 }
 function authenticateToken(req,res,next) {
-    if(!req.session.isPopulated){
+    if(!req.cookie['auth_token']){
         return returnjwterror({message:'no cookie'},res)
     }
-    const token = req.session.token
+    const token =req.cookie['auth_token']
 
 
     jwt.verify(token, process.env.TOKEN_SECRET, (err, id) => {

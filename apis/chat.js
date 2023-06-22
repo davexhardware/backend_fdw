@@ -38,7 +38,6 @@ let getchat = (ws, req) => {
     ws.onmessage=(msg)=>{
         let data=JSON.parse(msg.data);
         if(!authenticated){
-            if(data['access_token']) {
                 lib.authenticateWsToken(data, ws, (uid) => {
                     userid = uid
                     authenticated = true
@@ -52,7 +51,7 @@ let getchat = (ws, req) => {
                             msgwatcher = getwatcher(userid, friendId);
                     }
                 })
-            }else ws.send('error: provide authentication token first')
+
         }else {
 
             if (data['friendId']) {
