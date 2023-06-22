@@ -71,7 +71,7 @@ function validateName(name){
     return regex.test(String(name).toLowerCase())
 }
 
-let redirecthome=util.format('http://%s:%d',hostname,frontendport);
+let redirecthome=util.format('http://%s:%d/',hostname,frontendport);
 let redirectchat=util.format('http://%s:%d/chat',hostname,frontendport);
 let redirectlogin=util.format('http://%s:%d/login',hostname,frontendport);
 let redirectregist=util.format('http://%s:%d/register',hostname,frontendport);

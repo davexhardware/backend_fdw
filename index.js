@@ -12,7 +12,8 @@ const mongoose = require('mongoose');
 const app=express();
 const expressWs = require('express-ws')(app);
 var corsOptions = {
-    origin: lib.redirecthome,
+    origin: [lib.redirecthome,'http://localhost:'+lib.backendport],
+    credentials:true,
     optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
 app.use(cors(corsOptions));
