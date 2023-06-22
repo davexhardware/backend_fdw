@@ -25,8 +25,8 @@ app.use(function(req, res, next){ //This must be set before app.router
     req.server = server;
     next();
 });
-const user= 'fdwuser';
-const password= '1OVXZAlRs4UNjw1I'
+const user= process.env.DB_USER;
+const password=process.env.DB_PASS
 const addr=require('util').format("mongodb+srv://%s:%s@appdb.bjlme91.mongodb.net/?retryWrites=true&w=majority",user,password)
 mongoose.connect(addr,{ useNewUrlParser: true })
 const db=mongoose.connection;

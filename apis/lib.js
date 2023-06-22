@@ -1,9 +1,11 @@
 const hostname='localhost';
-const frontendport=5173;
-const backendport=5000;
+
 const jwt = require('jsonwebtoken');
+require("dotenv").config();
 const util=require('util')
 const errCode=403;
+const frontendport=process.env.F_PORT;
+const backendport=process.env.B_PORT;
 
 function returnjwterror(err,res){
     return res.status(401).json({error:'Error during JWT verification (check if you are logged in and retry) '+err.message})
