@@ -2,10 +2,9 @@ const users=require('../models/users');
 const lib = require("./lib");
 const messages=require('../models/messages');
 let getfriends=function(req,res) {
-    lib.authenticateToken(req, res, () => {
-        let userid = req.user['id']
+    lib.authenticateToken(req, res, (uid) => {
+        let userid = uid
         users.findById(userid).then((doc) => {
-
             doc.populate('friends').then(
                 (docp) => {
                     let friends = Array();
@@ -26,8 +25,8 @@ let getfriends=function(req,res) {
     })
 }
 let deletefriend=(req,res)=>{
-    lib.authenticateToken(req,res,()=> {
-        let userid=req.user['id']
+    lib.authenticateToken(req,res,(uid)=> {
+        let userid=uid
         if(lib.validateEmail(req.body.email)) {
             users.findOne({email: req.body.email}).then((doc) => {
                 let werefriends = false;
@@ -53,8 +52,8 @@ let deletefriend=(req,res)=>{
     })
 }
 let addfriend= (req,res)=>{
-    lib.authenticateToken(req,res,()=> {
-        let userid=req.user['id']
+    lib.authenticateToken(req,res,(uid)=> {
+        let userid=uid
         if(lib.validateEmail(req.body.email)) {
             users.findOne({email: req.body.email}).then((doc) => {
                 if (String(doc._id) === userid) {

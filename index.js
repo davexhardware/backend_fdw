@@ -9,10 +9,10 @@ process.env.TOKEN_SECRET=secret;
 const lib= require('./apis/lib')
 const mongoose = require('mongoose');
 
-const app=express();
+const app=module.exports.app=express();
 const expressWs = require('express-ws')(app);
 var corsOptions = {
-    origin: '*',
+    origin: lib.redirecthome, // http://localhost:5175
     credentials:true,
     optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }

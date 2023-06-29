@@ -1,7 +1,8 @@
 const messages = require('../models/messages')
-const lib=require('./lib');
-const ws=require('ws');
-function getmessages(userid,friendId){
+const lib = require('./lib');
+const users = require('../models/users')
+
+function getmessages(userid, friendId) {
     let msg = [];
 
     messages.find({
@@ -17,12 +18,27 @@ function getmessages(userid,friendId){
             el.set('msgtype', msgtype, {strict: false});
             msg.push(el)
         })
-    }).catch(err=>{
-        return 'error: '+err
+    }).catch(err => {
+        return {error: err}
     })
     return msg
 }
-function getwatcher(friendId,userid){
+
+function checkiffriends(userid, friendId,next,error) {
+    let arefriends=false
+    users.findById(userid).then(doc => {
+        doc.friends.forEach(fId => {
+            if (String(fId) === friendId) {
+                arefriends=true
+            }
+        })
+    }).then(()=> {
+        if (arefriends) next()
+        else error()
+    });
+}
+
+function getwatcher(friendId, userid) {
     return msgwatcher = messages.watch({
         $match: {
             'fullDocument.source': friendId,
@@ -30,47 +46,72 @@ function getwatcher(friendId,userid){
         }
     })
 }
-let getchat = (ws, req) => {
-    let authenticated=false
-    let userid=undefined;
-    let friendId=undefined;
-    let msgwatcher=undefined;
-    ws.onmessage=(msg)=>{
-        let data=JSON.parse(msg.data);
-        if(!authenticated){
-                lib.authenticateWsToken(data, ws, (uid) => {
-                    userid = uid
-                    authenticated = true
-                    if ( !data['friendId']) {
-                        ws.send('ok: authenticated, provide friendId')
-                    } else {
-                        friendId = data['friendId'];
-                        ws.send('ok: authenticated and connected to friend')
-                        ws.send(getmessages(userid, friendId));
-                        if (typeof msgwatcher=== 'undefined')
-                            msgwatcher = getwatcher(userid, friendId);
-                    }
-                })
 
-        }else {
+let getchat = (ws, req) => {
+    let authenticated = false
+    let userid = undefined;
+    let friendId = undefined;
+    let msgwatcher = undefined;
+    let changehandler=(next)=>{
+        let change;
+        switch(next.operationType) {
+            case 'update': {
+                change = ('update: ' + JSON.stringify({
+                    id: String(next.documentKey._id),
+                    field: next.updateDescription.updatedFields
+                }));
+                break;
+            }
+            case 'delete':{
+
+            }
+        }
+    }
+    ws.onmessage = (msg) => {
+        let data = JSON.parse(msg.data);
+        if (!authenticated) {
+            lib.authenticateWsToken(data, ws, (uid) => {
+                userid = uid
+                authenticated = true
+                if (!data['friendId']) {
+                    ws.send(JSON.stringify({ok: "authenticated, provide friendId"}))
+                } else checkiffriends(userid, data['friendId'],()=> {
+                    friendId = data['friendId'];
+                    ws.send(JSON.stringify({ok: "authenticated and connected to friend"}))
+                    ws.send(JSON.stringify(getmessages(userid, friendId)));
+                    if (typeof msgwatcher !== 'undefined')
+                        msgwatcher.close()
+                    msgwatcher = getwatcher(userid, friendId);
+                    msgwatcher.on('change', changehandler);
+                },()=> {
+                    ws.send(JSON.stringify({error: "users are not friends"}))
+                });
+            })
+
+        } else {
 
             if (data['friendId']) {
                 friendId = data['friendId']
-                getmessages(userid, friendId, ws);
-                if (!msgwatcher)
+                checkiffriends(userid,friendId,() =>{
+                    if (typeof msgwatcher !== 'undefined')
+                        msgwatcher.close()
                     msgwatcher = getwatcher(userid, friendId);
+                    msgwatcher.on('change', changehandler)
+                    ws.send(JSON.stringify({ok: 'friends connected'}))
+                    ws.send(JSON.stringify(getmessages(userid, friendId)));
+                },()=>{
+                    ws.send(JSON.stringify({error: "users are not friends"}))
+                });
             }
             if (data['message']) {
-                ws.send('msg received')
+                ws.send(JSON.stringify({ok: "message received"}))
             }
-            if (userid && friendId)
-                msgwatcher.on('change', next => {
-                    console.log(next)
-                });
+
         }
     }
-    ws.onclose()
-
+    ws.onclose(() => {
+        msgwatcher.close()
+    })
 
 
 }
