@@ -71,9 +71,7 @@ let getchat = (server,corsopt) => {
         let userid = undefined;
         let friendConn = undefined;
         let msgwatcher = undefined;
-        console.log(socket.handshake)
         let jwtoken=socket.handshake.headers.cookie.split('=')[1]
-        console.log(jwtoken)
         if (!authenticated) {
             lib.authenticateWsToken(jwtoken,(uid) => {
                 userid = uid
@@ -108,7 +106,7 @@ let getchat = (server,corsopt) => {
                 status:"error",
                 message:"friendId not provided"
             }
-            if (String(friendId)) {
+            if ( typeof friendId === "string") {
                 checkiffriends(userid, friendId, () => {
                     if (typeof msgwatcher !== 'undefined')
                         msgwatcher.close()
