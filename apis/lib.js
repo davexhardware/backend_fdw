@@ -16,17 +16,14 @@ function generateAccessToken(userid) {
 function lookforUser(userid,next,error){
     users.findById(userid).then(()=>{next()}).catch(()=>{error()})
 }
-function authenticateWsToken(data,ws,next){
-    if(!data.auth_token){
-        return ws.send('error: no auth_token')
-    }
-    const token = data.auth_token;
+function authenticateWsToken(token,next,error){
+
     jwt.verify(token, process.env.TOKEN_SECRET, (err, id) => {
 
         if (err) {
-            return ws.send('error: verification failed')
+            return error('verification')
         }
-        lookforUser(id.id,()=>{next(id.id)},()=>{return ws.send("error: can't find user with the specified userid is not in the database")})
+        lookforUser(id.id,()=>{next(id.id)},()=>{return error('nr')})
 
     })
 

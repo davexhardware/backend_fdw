@@ -1,7 +1,7 @@
 const messages = require('../models/messages')
 const lib = require('./lib');
-const users = require('../models/users')
-
+const users = require('../models/users');
+const socketio=require('socket.io')
 function getmessages(userid, friendId) {
     let msg = [];
 
@@ -47,13 +47,15 @@ function getwatcher(friendId, userid) {
     })
 }
 
-let getchat = (ws, req) => {
+let getchat = (server,corsopt) => {
+    var io = new socketio.Server(server,{cors: corsopt});
     let authenticated = false
     let userid = undefined;
     let friendId = undefined;
     let msgwatcher = undefined;
     let changehandler=(next)=>{
         let change;
+        console.log(next)
         switch(next.operationType) {
             case 'update': {
                 change = ('update: ' + JSON.stringify({
@@ -66,52 +68,61 @@ let getchat = (ws, req) => {
 
             }
         }
-    }
-    ws.onmessage = (msg) => {
-        let data = JSON.parse(msg.data);
+    };
+    io.on("connection", (socket) => {
+        console.log(socket.handshake)
+        let jwtoken=socket.handshake.headers.cookie
         if (!authenticated) {
-            lib.authenticateWsToken(data, ws, (uid) => {
+            lib.authenticateWsToken(jwtoken,(uid) => {
                 userid = uid
                 authenticated = true
-                if (!data['friendId']) {
-                    ws.send(JSON.stringify({ok: "authenticated, provide friendId"}))
-                } else checkiffriends(userid, data['friendId'],()=> {
+                if (!socket.handshake.query.friendId) {
+                    socket.emit("authenticated", "authenticated, provide friendId")
+                } else checkiffriends(userid, socket.handshake.query.friendId,()=> {
                     friendId = data['friendId'];
-                    ws.send(JSON.stringify({ok: "authenticated and connected to friend"}))
-                    ws.send(JSON.stringify(getmessages(userid, friendId)));
+                    socket.emit("friendOk", "authenticated and connected to friend")
+                    socket.emit("messages", JSON.stringify(getmessages(userid, friendId)))
                     if (typeof msgwatcher !== 'undefined')
                         msgwatcher.close()
                     msgwatcher = getwatcher(userid, friendId);
                     msgwatcher.on('change', changehandler);
                 },()=> {
-                    ws.send(JSON.stringify({error: "users are not friends"}))
+                    socket.emit("error", "users are not friends")
                 });
+            }, (err)=>{
+                if(err==='verification'){
+                    socket.emit("error","jwt verification failed")
+                }else if(err==='nr'){
+                    socket.emit("error","user not registered")
+                }
+                socket.disconnect(true)
             })
 
         } else {
 
-            if (data['friendId']) {
-                friendId = data['friendId']
+            if (socket.handshake.query) {
+                friendId = socket.handshake.query.friendId
                 checkiffriends(userid,friendId,() =>{
                     if (typeof msgwatcher !== 'undefined')
                         msgwatcher.close()
                     msgwatcher = getwatcher(userid, friendId);
                     msgwatcher.on('change', changehandler)
-                    ws.send(JSON.stringify({ok: 'friends connected'}))
-                    ws.send(JSON.stringify(getmessages(userid, friendId)));
+                    socket.emit("friendOk", "authenticated and connected to friend")
+                    socket.emit("messages", JSON.stringify(getmessages(userid, friendId)))
                 },()=>{
-                    ws.send(JSON.stringify({error: "users are not friends"}))
+                    socket.emit("error", "users are not friends")
                 });
-            }
-            if (data['message']) {
-                ws.send(JSON.stringify({ok: "message received"}))
             }
 
         }
-    }
-    ws.onclose(() => {
-        msgwatcher.close()
+        socket.on("disconnect",() => {
+            msgwatcher.close()
+        })
+        socket.on("sendmsg",(data)=>{
+
+        })
     })
+
 
 
 }

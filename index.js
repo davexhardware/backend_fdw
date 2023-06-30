@@ -10,8 +10,7 @@ const lib= require('./apis/lib')
 const mongoose = require('mongoose');
 
 const app=module.exports.app=express();
-const expressWs = require('express-ws')(app);
-var corsOptions = {
+var corsOptions = module.exports.corsopt= {
     origin: lib.redirecthome, // http://localhost:5175
     credentials:true,
     optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
@@ -52,4 +51,3 @@ app.use('/api', apirouter)
 
 const server=app.listen(lib.backendport, () => { console.log('app in ascolto sulla porta: '+lib.backendport) })
 
-module.exports=expressWs;
