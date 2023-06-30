@@ -40,39 +40,28 @@ function checkiffriends(userid, friendId,next,error) {
     });
 }
 
-function getwatcher(friendId, userid) {
+function getwatcher(userid,friendId) {
     return msgwatcher = messages.watch([
         {
-        $match: {
-            $and: [
-                {'operationType': 'insert'},
-                {'fullDocument.source': new mongoose.Schema.Types.ObjectId(friendId)},
-                {'fullDocument.dest': new mongoose.Schema.Types.ObjectId(userid)}
-]
-        }
+        $match:
+            {
+                $and:[
+                    {'fullDocument.dest': {$in: [new mongoose.Types.ObjectId(userid)]}},
+                    {'operationType':'insert'}
+            ]}
+
     }])
 }
 
 let getchat = (server,corsopt) => {
     var io = new socketio.Server(server,{cors: corsopt});
 
-    let changehandler=(next)=>{
-        let change;
-        console.log(next)
-        switch(next.operationType) {
-            case 'update': {
-                change = ('update: ' + JSON.stringify({
-                    id: String(next.documentKey._id),
-                    field: next.updateDescription.updatedFields
-                }));
-                break;
-            }
-            case 'delete':{
-
-            }
-        }
-    };
     io.on("connection", (socket) => {
+        let changehandler=(el)=>{
+            let newmsg=el.fullDocument;
+            newmsg.set('msgtype', 'r', {strict: false});
+            socket.emit('newMessage',newmsg)
+        };
         let authenticated = false
         let userid = undefined;
         let friendConn = undefined;
