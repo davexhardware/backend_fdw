@@ -72,7 +72,9 @@ let getchat = (server,corsopt) => {
         let friendId = undefined;
         let msgwatcher = undefined;
         console.log(socket.handshake)
-        let jwtoken=socket.handshake.headers.cookie
+        let jwtoken=socket.handshake.headers.cookie.split('=')[1]
+
+        console.log(jwtoken)
         if (!authenticated) {
             lib.authenticateWsToken(jwtoken,(uid) => {
                 userid = uid
