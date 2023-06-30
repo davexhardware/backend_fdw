@@ -17,11 +17,13 @@ function getmessages(userid, friendId) {
             }
             el.set('msgtype', msgtype, {strict: false});
             msg.push(el)
+            console.log(msg,el)
         })
-        return msg
+        return msg;
     }).catch(err => {
         return {error: err}
-    })
+    });
+
 }
 
 function checkiffriends(userid, friendId,next,error) {
@@ -114,7 +116,6 @@ let getchat = (server,corsopt) => {
                     msgwatcher.on('change', changehandler)
                     resp.status="ok";
                     friendConn=friendId;
-
                     let msgs=getmessages(userid, friendId)
                     console.log(msgs)
                     resp.message=msgs
