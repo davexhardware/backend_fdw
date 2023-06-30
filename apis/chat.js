@@ -125,7 +125,8 @@ let getchat = (server,corsopt) => {
         });
 
         socket.on("disconnect",() => {
-            msgwatcher.close();
+            if (typeof msgwatcher !== 'undefined')
+                msgwatcher.close()
         })
         socket.on("send",(data,callback)=>{
             let message=JSON.parse(data);
