@@ -142,8 +142,10 @@ let getchat = (server,corsopt) => {
             message.source=userid;
             message.dest=friendConn
             console.log(message)
-            messages.create(message).then(
-                callback('ok')
+            messages.create(message).then(succ=> {
+                    succ.set('msgtype', 's', {strict: false});
+                    callback(succ)
+                }
             ).catch(err=>{
                 callback(JSON.stringify({status:'error',message:err}))
             })
