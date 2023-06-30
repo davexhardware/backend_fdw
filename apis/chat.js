@@ -2,7 +2,7 @@ const messages = require('../models/messages')
 const lib = require('./lib');
 const users = require('../models/users');
 const socketio=require('socket.io')
-function getmessages(userid, friendId) {
+function getmessages(userid, friendId,next) {
     let msg = [];
 
     messages.find({
@@ -17,11 +17,10 @@ function getmessages(userid, friendId) {
             }
             el.set('msgtype', msgtype, {strict: false});
             msg.push(el)
-            console.log(msg,el)
         })
-        return msg;
+        next(msg);
     }).catch(err => {
-        return {error: err}
+        next({error: err})
     });
 
 }
@@ -116,10 +115,10 @@ let getchat = (server,corsopt) => {
                     msgwatcher.on('change', changehandler)
                     resp.status="ok";
                     friendConn=friendId;
-                    let msgs=getmessages(userid, friendId)
-                    console.log(msgs)
-                    resp.message=msgs
-                    callback(resp)
+                    getmessages(userid, friendId,(msgs)=>{
+                        resp.message=msgs
+                        callback(resp)
+                    })
                 }, () => {
                     resp.message="users are not friends"
                     callback(resp)
