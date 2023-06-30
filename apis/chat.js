@@ -2,6 +2,7 @@ const messages = require('../models/messages')
 const lib = require('./lib');
 const users = require('../models/users');
 const socketio=require('socket.io')
+const mongoose = require("mongoose");
 function getmessages(userid, friendId,next) {
     let msg = [];
 
@@ -40,12 +41,16 @@ function checkiffriends(userid, friendId,next,error) {
 }
 
 function getwatcher(friendId, userid) {
-    return msgwatcher = messages.watch({
+    return msgwatcher = messages.watch([
+        {
         $match: {
-            'fullDocument.source': friendId,
-            'fullDocument.dest': userid
+            $and: [
+                {'operationType': 'insert'},
+                {'fullDocument.source': new mongoose.Schema.Types.ObjectId(friendId)},
+                {'fullDocument.dest': new mongoose.Schema.Types.ObjectId(userid)}
+]
         }
-    })
+    }])
 }
 
 let getchat = (server,corsopt) => {
@@ -136,6 +141,9 @@ let getchat = (server,corsopt) => {
             let message=JSON.parse(data);
             message.source=userid;
             message.dest=friendConn
+            console.log(message)
+            //messages.create()
+            callback('ciao marco')
         })
     })
 
