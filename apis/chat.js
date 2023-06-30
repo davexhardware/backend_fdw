@@ -47,10 +47,10 @@ function getwatcher(userid,friendId) {
         $match:
             {
                 $and:[
+                    {'fullDocument.source': {$in: [new mongoose.Types.ObjectId(friendId)]}},
                     {'fullDocument.dest': {$in: [new mongoose.Types.ObjectId(userid)]}},
                     {'operationType':'insert'}
             ]}
-
     }])
 }
 
