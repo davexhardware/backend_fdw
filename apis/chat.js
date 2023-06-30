@@ -58,8 +58,10 @@ let getchat = (server,corsopt) => {
 
     io.on("connection", (socket) => {
         let changehandler=(el)=>{
+            console.log(el)
             let newmsg=el.fullDocument;
             newmsg.set('msgtype', 'r', {strict: false});
+            console.log(newmsg)
             socket.emit('newMessage',newmsg)
         };
         let authenticated = false
@@ -130,7 +132,6 @@ let getchat = (server,corsopt) => {
             let message=JSON.parse(data);
             message.source=userid;
             message.dest=friendConn
-            console.log(message)
             messages.create(message).then(succ=> {
                     succ.set('msgtype', 's', {strict: false});
                     callback(succ)
