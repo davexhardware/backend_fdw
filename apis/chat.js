@@ -115,11 +115,14 @@ let getchat = (server,corsopt) => {
                     resp.status="ok";
                     friendConn=friendId;
                     resp.message=getmessages(userid, friendId)
+                    callback(resp)
                 }, () => {
                     resp.message="users are not friends"
+                    callback(resp)
                 });
+            }else{
+                callback(resp)
             }
-            callback(resp)
         });
 
         socket.on("disconnect",() => {
