@@ -49,10 +49,7 @@ function getwatcher(friendId, userid) {
 
 let getchat = (server,corsopt) => {
     var io = new socketio.Server(server,{cors: corsopt});
-    let authenticated = false
-    let userid = undefined;
-    let friendId = undefined;
-    let msgwatcher = undefined;
+
     let changehandler=(next)=>{
         let change;
         console.log(next)
@@ -70,14 +67,19 @@ let getchat = (server,corsopt) => {
         }
     };
     io.on("connection", (socket) => {
+        let authenticated = false
+        let userid = undefined;
+        let friendId = undefined;
+        let msgwatcher = undefined;
         console.log(socket.handshake)
         let jwtoken=socket.handshake.headers.cookie
         if (!authenticated) {
             lib.authenticateWsToken(jwtoken,(uid) => {
                 userid = uid
                 authenticated = true
-                if (!socket.handshake.query.friendId) {
-                    socket.emit("authenticated", "authenticated, provide friendId")
+                socket.emit("authenticated", "authenticated, provide friendId")
+                /*
+                if (!socket.handshake.query.friendId){
                 } else checkiffriends(userid, socket.handshake.query.friendId,()=> {
                     friendId = data['friendId'];
                     socket.emit("friendOk", "authenticated and connected to friend")
@@ -86,9 +88,10 @@ let getchat = (server,corsopt) => {
                         msgwatcher.close()
                     msgwatcher = getwatcher(userid, friendId);
                     msgwatcher.on('change', changehandler);
+
                 },()=> {
                     socket.emit("error", "users are not friends")
-                });
+                });*/
             }, (err)=>{
                 if(err==='verification'){
                     socket.emit("error","jwt verification failed")
@@ -97,24 +100,23 @@ let getchat = (server,corsopt) => {
                 }
                 socket.disconnect(true)
             })
+        }
+        socket.on("connectFriend", (friendId)=> {
 
-        } else {
-
-            if (socket.handshake.query) {
-                friendId = socket.handshake.query.friendId
-                checkiffriends(userid,friendId,() =>{
+            if (String(friendId)) {
+                checkiffriends(userid, friendId, () => {
                     if (typeof msgwatcher !== 'undefined')
                         msgwatcher.close()
                     msgwatcher = getwatcher(userid, friendId);
                     msgwatcher.on('change', changehandler)
                     socket.emit("friendOk", "authenticated and connected to friend")
                     socket.emit("messages", JSON.stringify(getmessages(userid, friendId)))
-                },()=>{
+                }, () => {
                     socket.emit("error", "users are not friends")
                 });
             }
+        });
 
-        }
         socket.on("disconnect",() => {
             msgwatcher.close();
         })
