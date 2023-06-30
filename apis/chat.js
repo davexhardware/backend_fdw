@@ -60,7 +60,7 @@ let getchat = (server,corsopt) => {
         let changehandler=(el)=>{
             console.log(el)
             let newmsg=el.fullDocument;
-            newmsg.set('msgtype', 'r', {strict: false});
+            newmsg.msgtype='r';
             console.log(newmsg)
             socket.emit('newMessage',newmsg)
         };
