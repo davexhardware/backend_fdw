@@ -106,7 +106,7 @@ let getchat = (server,corsopt) => {
                 status:"error",
                 message:"friendId not provided"
             }
-            if ( typeof friendId === "string") {
+            if (typeof friendId === "string") {
                 checkiffriends(userid, friendId, () => {
                     if (typeof msgwatcher !== 'undefined')
                         msgwatcher.close()
@@ -114,7 +114,10 @@ let getchat = (server,corsopt) => {
                     msgwatcher.on('change', changehandler)
                     resp.status="ok";
                     friendConn=friendId;
-                    resp.message=getmessages(userid, friendId)
+
+                    let msgs=getmessages(userid, friendId)
+                    console.log(msgs)
+                    resp.message=msgs
                     callback(resp)
                 }, () => {
                     resp.message="users are not friends"
