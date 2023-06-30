@@ -18,10 +18,10 @@ function getmessages(userid, friendId) {
             el.set('msgtype', msgtype, {strict: false});
             msg.push(el)
         })
+        return msg
     }).catch(err => {
         return {error: err}
     })
-    return msg
 }
 
 function checkiffriends(userid, friendId,next,error) {
