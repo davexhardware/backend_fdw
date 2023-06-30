@@ -69,11 +69,10 @@ let getchat = (server,corsopt) => {
     io.on("connection", (socket) => {
         let authenticated = false
         let userid = undefined;
-        let friendId = undefined;
+        let friendConn = undefined;
         let msgwatcher = undefined;
         console.log(socket.handshake)
         let jwtoken=socket.handshake.headers.cookie.split('=')[1]
-
         console.log(jwtoken)
         if (!authenticated) {
             lib.authenticateWsToken(jwtoken,(uid) => {
@@ -103,27 +102,35 @@ let getchat = (server,corsopt) => {
                 socket.disconnect(true)
             })
         }
-        socket.on("connectFriend", (friendId)=> {
 
+        socket.on("connectFriend", (friendId,callback)=> {
+            let resp={
+                status:"error",
+                message:"friendId not provided"
+            }
             if (String(friendId)) {
                 checkiffriends(userid, friendId, () => {
                     if (typeof msgwatcher !== 'undefined')
                         msgwatcher.close()
                     msgwatcher = getwatcher(userid, friendId);
                     msgwatcher.on('change', changehandler)
-                    socket.emit("friendOk", "authenticated and connected to friend")
-                    socket.emit("messages", JSON.stringify(getmessages(userid, friendId)))
+                    resp.status="ok";
+                    friendConn=friendId;
+                    resp.message=getmessages(userid, friendId)
                 }, () => {
-                    socket.emit("error", "users are not friends")
+                    resp.message="users are not friends"
                 });
             }
+            callback(resp)
         });
 
         socket.on("disconnect",() => {
             msgwatcher.close();
         })
-        socket.on("sendmsg",(data)=>{
-
+        socket.on("send",(data,callback)=>{
+            let message=JSON.parse(data);
+            message.source=userid;
+            message.dest=friendConn
         })
     })
 
