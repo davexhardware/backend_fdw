@@ -59,8 +59,10 @@ let getchat = (server,corsopt) => {
 
     io.on("connection", (socket) => {
         let changehandler=(el)=>{
-            let newmsg=el.fullDocument;
+            console.log(el)
+            let newmsg= el.fullDocument;
             newmsg.msgtype='r';
+            console.log(newmsg)
             socket.emit('newMessage',newmsg)
         };
         let authenticated = false
