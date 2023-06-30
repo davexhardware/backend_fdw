@@ -1,4 +1,5 @@
 const express = require('express');
+const chatHandler=require('./apis/chat');
 const cors = require('cors');
 const cookieparser=require('cookie-parser')
 //creates the secret token for jwt signing
@@ -8,10 +9,9 @@ delete process.env.TOKEN_SECRET;
 process.env.TOKEN_SECRET=secret;
 const lib= require('./apis/lib')
 const mongoose = require('mongoose');
-
-const app=module.exports.app=express();
-var corsOptions = module.exports.corsopt= {
-    origin: lib.redirecthome, // http://localhost:5175
+const app=express()
+var corsOptions = {
+    origin:  lib.redirecthome, // http://localhost:5175
     credentials:true,
     optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
@@ -22,10 +22,7 @@ app.use(cookieparser());
 app.use(express.json());
 
 const apirouter=require('./routers/api.js');
-app.use(function(req, res, next){ //This must be set before app.router
-    req.server = server;
-    next();
-});
+
 const user= process.env.DB_USER;
 const password=process.env.DB_PASS
 const addr=require('util').format("mongodb+srv://%s:%s@appdb.bjlme91.mongodb.net/?retryWrites=true&w=majority",user,password)
@@ -49,5 +46,7 @@ app.get('/connection_check', (req, res) => {
 })
 app.use('/api', apirouter)
 
-const server=app.listen(lib.backendport, () => { console.log('app in ascolto sulla porta: '+lib.backendport) })
+const server= require('http').createServer(app)
+chatHandler.getchat(server,corsOptions)
+server.listen(lib.backendport, () => { console.log('app in ascolto sulla porta: '+lib.backendport) })
 

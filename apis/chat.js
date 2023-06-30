@@ -116,7 +116,7 @@ let getchat = (server,corsopt) => {
 
         }
         socket.on("disconnect",() => {
-            msgwatcher.close()
+            msgwatcher.close();
         })
         socket.on("sendmsg",(data)=>{
 
