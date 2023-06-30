@@ -3,7 +3,8 @@ const lib = require('./lib');
 const users = require('../models/users');
 const socketio=require('socket.io')
 const mongoose = require("mongoose");
-function getmessages(userid, friendId,next) {
+function getmessages(userid, friendId,next)
+{
     let msg = [];
 
     messages.find({
@@ -58,10 +59,8 @@ let getchat = (server,corsopt) => {
 
     io.on("connection", (socket) => {
         let changehandler=(el)=>{
-            console.log(el)
             let newmsg=el.fullDocument;
             newmsg.msgtype='r';
-            console.log(newmsg)
             socket.emit('newMessage',newmsg)
         };
         let authenticated = false
@@ -128,6 +127,7 @@ let getchat = (server,corsopt) => {
             if (typeof msgwatcher !== 'undefined')
                 msgwatcher.close()
         })
+
         socket.on("send",(data,callback)=>{
             let message=JSON.parse(data);
             message.source=userid;
