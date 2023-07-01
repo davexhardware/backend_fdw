@@ -8,3 +8,4 @@ Credits for the project:
   <li>Marco Roberto, for the frontend part</li>
 </ul>
 The GitHub repository of the frontend (in React) can be found at <a href="https://github.com/amaliamon/frontend_projectFdW">amaliamon's repo</a>
+P.S.: the .env file has not been uploaded for security reasons. It contains the Backend and the Frontend local ports and the MongoDB's Username and Password.
