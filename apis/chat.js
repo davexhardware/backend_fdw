@@ -56,13 +56,10 @@ function getwatcher(userid,friendId) {
 
 let getchat = (server,corsopt) => {
     var io = new socketio.Server(server,{cors: corsopt});
-
     io.on("connection", (socket) => {
         let changehandler=(el)=>{
-            console.log(el)
             let newmsg= el.fullDocument;
             newmsg.msgtype='r';
-            console.log(newmsg)
             socket.emit('newMessage',newmsg)
         };
         let authenticated = false
