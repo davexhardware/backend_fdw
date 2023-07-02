@@ -27,7 +27,7 @@ let register = (req,res)=>{
                                                 password: String(hash).trim(),
                                             }).then(el => {
                                                 let token = lib.generateAccessToken(String(el['_id']))
-                                                return res.status(200).json({access_token:token})
+                                                return res.status(200).json({success:'registered'})
                                             }).catch(e => {
                                                 return res.status(lib.errCode).json({error: wrong+e.message})
                                             });
