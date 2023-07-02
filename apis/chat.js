@@ -75,20 +75,6 @@ let getchat = (server,corsopt) => {
                 userid = uid
                 authenticated = true
                 socket.emit("authenticated", "authenticated, provide friendId")
-                /*
-                if (!socket.handshake.query.friendId){
-                } else checkiffriends(userid, socket.handshake.query.friendId,()=> {
-                    friendId = data['friendId'];
-                    socket.emit("friendOk", "authenticated and connected to friend")
-                    socket.emit("messages", JSON.stringify(getmessages(userid, friendId)))
-                    if (typeof msgwatcher !== 'undefined')
-                        msgwatcher.close()
-                    msgwatcher = getwatcher(userid, friendId);
-                    msgwatcher.on('change', changehandler);
-
-                },()=> {
-                    socket.emit("error", "users are not friends")
-                });*/
             }, (err)=>{
                 if(err==='verification'){
                     socket.emit("error","jwt verification failed")
